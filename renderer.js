@@ -10,6 +10,7 @@ const pageInfo = document.getElementById("page-info");
 const zoomInfo = document.getElementById("zoom-info");
 const thumbnailSidebar = document.getElementById("thumbnail-sidebar");
 const thumbnailContainer = document.getElementById("thumbnail-container");
+const detailsModal = document.getElementById("details-modal");
 
 let thumbnailsVisible = false;
 let lastFitMode = null; // 'width', 'page', null
@@ -163,6 +164,34 @@ document.getElementById("toggle-thumbnails").addEventListener("click", () => {
   
   const button = document.getElementById("toggle-thumbnails");
   button.textContent = thumbnailsVisible ? "썸네일 숨기기" : "썸네일 보기";
+});
+
+// 상세 정보 모달 표시
+document.getElementById("show-details").addEventListener("click", () => {
+  if (pdfHandler.pdfDoc) {
+    showDetailsModal();
+  } else {
+    alert("PDF 파일을 먼저 열어주세요.");
+  }
+});
+
+// 모달 닫기 이벤트들
+document.querySelector(".close-modal").addEventListener("click", () => {
+  detailsModal.style.display = "none";
+});
+
+// 모달 배경 클릭으로 닫기
+detailsModal.addEventListener("click", (event) => {
+  if (event.target === detailsModal) {
+    detailsModal.style.display = "none";
+  }
+});
+
+// ESC 키로 모달 닫기
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && detailsModal.style.display === "block") {
+    detailsModal.style.display = "none";
+  }
 });
 
 // 마우스 휠로 확대/축소 (Ctrl + 휠)
@@ -325,3 +354,44 @@ window.addEventListener('resize', async () => {
     }, 100); // 100ms 지연으로 연속된 리사이즈 이벤트 처리
   }
 });
+
+// 상세 정보 모달 표시 함수
+function showDetailsModal() {
+  const detailInfo = pdfHandler.getDetailedPdfInfo();
+  
+  // 기본 정보 설정
+  document.getElementById("detail-filename").textContent = detailInfo.fileName;
+  document.getElementById("detail-filesize").textContent = detailInfo.fileSize;
+  document.getElementById("detail-filepath").textContent = detailInfo.filePath;
+  document.getElementById("detail-pages").textContent = detailInfo.totalPages;
+  document.getElementById("detail-created").textContent = detailInfo.creationDate;
+  document.getElementById("detail-modified").textContent = detailInfo.modificationDate;
+  
+  // PDF 메타데이터 설정
+  document.getElementById("detail-title").textContent = detailInfo.title;
+  document.getElementById("detail-author").textContent = detailInfo.author;
+  document.getElementById("detail-subject").textContent = detailInfo.subject;
+  document.getElementById("detail-keywords").textContent = detailInfo.keywords;
+  document.getElementById("detail-creator").textContent = detailInfo.creator;
+  document.getElementById("detail-producer").textContent = detailInfo.producer;
+  
+  // 기술 정보 설정
+  document.getElementById("detail-version").textContent = detailInfo.pdfVersion;
+  document.getElementById("detail-pdf-created").textContent = detailInfo.pdfCreationDate;
+  document.getElementById("detail-pdf-modified").textContent = detailInfo.pdfModDate;
+  document.getElementById("detail-linearized").textContent = detailInfo.linearized ? "예" : "아니오";
+  document.getElementById("detail-encrypted").textContent = detailInfo.encrypted ? "예" : "아니오";
+  
+  // 권한 정보 설정
+  const permissionsContainer = document.getElementById("detail-permissions");
+  permissionsContainer.innerHTML = "";
+  detailInfo.permissions.forEach(permission => {
+    const permissionSpan = document.createElement("span");
+    permissionSpan.className = "permission-item";
+    permissionSpan.textContent = permission;
+    permissionsContainer.appendChild(permissionSpan);
+  });
+  
+  // 모달 표시
+  detailsModal.style.display = "block";
+}

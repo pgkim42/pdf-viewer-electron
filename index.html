@@ -142,6 +142,124 @@
         text-align: center;
       }
 
+      /* 모달 스타일 */
+      .modal {
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .modal-content {
+        background-color: white;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 800px;
+        max-height: 90%;
+        overflow-y: auto;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        border-bottom: 1px solid #e9ecef;
+        background-color: #f8f9fa;
+        border-radius: 8px 8px 0 0;
+      }
+
+      .modal-header h2 {
+        margin: 0;
+        color: #333;
+      }
+
+      .close-modal {
+        font-size: 28px;
+        cursor: pointer;
+        color: #666;
+        transition: color 0.2s;
+      }
+
+      .close-modal:hover {
+        color: #000;
+      }
+
+      .modal-body {
+        padding: 20px;
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+      }
+
+      .info-section {
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        padding: 15px;
+        background-color: #fafbfc;
+      }
+
+      .info-section h3 {
+        margin: 0 0 15px 0;
+        color: #495057;
+        font-size: 16px;
+        border-bottom: 2px solid #007bff;
+        padding-bottom: 5px;
+      }
+
+      .info-row {
+        display: flex;
+        margin-bottom: 10px;
+        align-items: flex-start;
+      }
+
+      .info-label {
+        font-weight: bold;
+        min-width: 120px;
+        color: #495057;
+        font-size: 14px;
+      }
+
+      .info-value {
+        flex: 1;
+        color: #212529;
+        font-size: 14px;
+        word-break: break-all;
+      }
+
+      .permissions-list {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .permission-item {
+        background-color: #e3f2fd;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        color: #1976d2;
+        display: inline-block;
+        margin-right: 5px;
+        margin-bottom: 2px;
+      }
+
+      @media (max-width: 768px) {
+        .info-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
     </style>
   </head>
   <body>
@@ -165,6 +283,9 @@
       
       <!-- 썸네일 토글 -->
       <button id="toggle-thumbnails">썸네일 토글</button>
+      
+      <!-- 상세 정보 버튼 -->
+      <button id="show-details">상세 정보</button>
     </div>
 
     <!-- PDF 정보 영역 -->
@@ -198,6 +319,111 @@
         </div>
         <div id="thumbnail-container" class="thumbnail-container">
           <!-- 썸네일들이 여기에 동적으로 생성됩니다 -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 상세 정보 모달 -->
+    <div id="details-modal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>PDF 상세 정보</h2>
+          <span class="close-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+          <div class="info-grid">
+            <!-- 기본 정보 섹션 -->
+            <div class="info-section">
+              <h3>파일 정보</h3>
+              <div class="info-row">
+                <span class="info-label">파일명:</span>
+                <span class="info-value" id="detail-filename"></span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">파일 크기:</span>
+                <span class="info-value" id="detail-filesize"></span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">파일 경로:</span>
+                <span class="info-value" id="detail-filepath"></span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">페이지 수:</span>
+                <span class="info-value" id="detail-pages"></span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">생성일:</span>
+                <span class="info-value" id="detail-created"></span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">수정일:</span>
+                <span class="info-value" id="detail-modified"></span>
+              </div>
+            </div>
+
+            <!-- PDF 메타데이터 섹션 -->
+            <div class="info-section">
+              <h3>PDF 메타데이터</h3>
+              <div class="info-row">
+                <span class="info-label">제목:</span>
+                <span class="info-value" id="detail-title"></span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">작성자:</span>
+                <span class="info-value" id="detail-author"></span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">주제:</span>
+                <span class="info-value" id="detail-subject"></span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">키워드:</span>
+                <span class="info-value" id="detail-keywords"></span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">생성 프로그램:</span>
+                <span class="info-value" id="detail-creator"></span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">생성자:</span>
+                <span class="info-value" id="detail-producer"></span>
+              </div>
+            </div>
+
+            <!-- 기술 정보 섹션 -->
+            <div class="info-section">
+              <h3>기술 정보</h3>
+              <div class="info-row">
+                <span class="info-label">PDF 버전:</span>
+                <span class="info-value" id="detail-version"></span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">PDF 생성일:</span>
+                <span class="info-value" id="detail-pdf-created"></span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">PDF 수정일:</span>
+                <span class="info-value" id="detail-pdf-modified"></span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">선형화:</span>
+                <span class="info-value" id="detail-linearized"></span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">암호화:</span>
+                <span class="info-value" id="detail-encrypted"></span>
+              </div>
+            </div>
+
+            <!-- 권한 정보 섹션 -->
+            <div class="info-section">
+              <h3>권한 정보</h3>
+              <div class="info-row">
+                <span class="info-label">허용된 작업:</span>
+                <div class="info-value permissions-list" id="detail-permissions"></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
